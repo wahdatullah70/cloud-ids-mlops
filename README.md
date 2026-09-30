@@ -2,7 +2,29 @@
 
 A research project focused on **multi-sensor intrusion detection for cloud-native and HPC-oriented infrastructure**, combining security telemetry, streaming components, and machine-learning inference.
 
-> This repository is being organized as the public engineering companion for the research work. Sensitive infrastructure data, credentials, private datasets, and environment-specific secrets are intentionally excluded.
+> This repository is the public engineering companion for the research work. Sensitive infrastructure data, credentials, private datasets, and environment-specific secrets are intentionally excluded.
+
+---
+
+## ⚡ Quick Demo
+
+The repository now includes a small reproducible multi-sensor feature-fusion example using normalized Suricata, Zeek, and Tetragon events.
+
+```bash
+python3 src/fusion_demo.py examples/events.json
+```
+
+The demo:
+
+- reads normalized events from three sensor types,
+- builds a fused feature representation,
+- calculates an illustrative probability,
+- applies a configurable threshold,
+- outputs structured JSON.
+
+> The public demo uses illustrative weights only. It is **not** the original trained research model and does not expose confidential model artifacts.
+
+📐 [Architecture documentation](docs/architecture.md)
 
 ---
 
@@ -96,19 +118,7 @@ These figures describe the documented research experiment and should not be trea
 
 Technology areas used across the research environment include:
 
-- Kubernetes
-- Helm
-- Calico
-- Longhorn
-- Suricata
-- Zeek
-- Tetragon
-- Redpanda
-- Redis
-- Fluent Bit
-- Python
-- ONNX
-- Linux
+`Kubernetes` · `Helm` · `Calico` · `Longhorn` · `Suricata` · `Zeek` · `Tetragon` · `Redpanda` · `Redis` · `Fluent Bit` · `Python` · `ONNX` · `Linux`
 
 ---
 
@@ -128,36 +138,30 @@ Validation activities include:
 
 ---
 
+## 📁 Public Repository Layout
+
+```text
+cloud-ids-mlops/
+├── README.md
+├── docs/
+│   └── architecture.md
+├── examples/
+│   └── events.json
+└── src/
+    └── fusion_demo.py
+```
+
+---
+
 ## 💡 Engineering Skills Demonstrated
 
-This project demonstrates work across:
-
-- Cloud-native security engineering
-- Kubernetes operations
-- Linux infrastructure
-- Security telemetry
-- Streaming/data pipelines
-- Machine-learning deployment
-- ONNX inference
-- MLOps concepts
-- Reproducible experimentation
-- Performance/overhead measurement
+Cloud-native security · Kubernetes operations · Linux infrastructure · security telemetry · streaming/data pipelines · ML deployment · ONNX inference · MLOps · reproducible experimentation
 
 ---
 
 ## 🔒 Security & Reproducibility Note
 
-This public repository should contain only material that is safe to publish. Do **not** commit:
-
-- API keys or tokens
-- kubeconfig credentials
-- cloud credentials
-- private IP inventories when sensitive
-- service-account keys
-- private datasets
-- unpublished confidential evidence
-
-Use environment variables, Kubernetes Secrets, or an appropriate secret manager for credentials.
+Do **not** commit API keys, kubeconfig credentials, cloud credentials, service-account keys, private datasets, or confidential research evidence. Use environment variables, Kubernetes Secrets, or a secret manager.
 
 ---
 
