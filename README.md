@@ -1,5 +1,8 @@
 # Cloud-Native IDS + MLOps Research
 
+[![CI](https://github.com/wahdatullah70/cloud-ids-mlops/actions/workflows/ci.yml/badge.svg)](https://github.com/wahdatullah70/cloud-ids-mlops/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A portfolio/research project for **multi-sensor intrusion detection in cloud-native and HPC-oriented infrastructure**, combining network/runtime security telemetry, stream processing, machine-learning inference, Kubernetes operations, and reproducible validation.
 
 > This is the public engineering companion to the research work. Sensitive infrastructure data, credentials, private datasets, and restricted research evidence are intentionally excluded.
@@ -27,21 +30,31 @@ The architecture separates **collection, normalization, streaming, inference, an
 
 ## Quick demo
 
-A safe public example demonstrates the idea of multi-sensor feature fusion:
-
 ```bash
 python3 src/fusion_demo.py examples/events.json
 ```
 
-The demo:
+The demo reads example Suricata, Zeek, and Tetragon events, creates a fused feature representation, calculates an illustrative probability, applies a configurable threshold, and emits structured JSON.
 
-- reads example Suricata, Zeek, and Tetragon events;
-- normalizes/fuses them into a compact representation;
-- calculates an illustrative probability;
-- applies a configurable threshold;
-- outputs structured JSON.
+Compare a deterministic run with [`examples/expected_output.json`](examples/expected_output.json).
 
 > The public demo uses illustrative weights. It is **not** the original trained research model and does not claim to reproduce the documented research metrics.
+
+## Tests and CI
+
+Run locally:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+GitHub Actions automatically:
+
+- runs the unit tests;
+- executes the public fusion demo;
+- validates the generated JSON output.
+
+Tests cover feature-fusion counts, probability bounds, and low-risk behavior for an empty input set.
 
 ## End-to-end engineering flow
 
@@ -93,8 +106,6 @@ These values describe the documented experiment and are not presented as univers
 
 ## Kubernetes deployment model
 
-The broader platform separates components such as:
-
 ```text
 Suricata / Zeek / Tetragon
            │
@@ -120,7 +131,11 @@ Deployment details: [docs/deployment-topology.md](docs/deployment-topology.md)
 
 ```text
 cloud-ids-mlops/
+├── .github/workflows/ci.yml
 ├── README.md
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── LICENSE
 ├── docs/
 │   ├── architecture.md
 │   ├── event-flow.md
@@ -129,7 +144,10 @@ cloud-ids-mlops/
 │   ├── security.md
 │   └── troubleshooting.md
 ├── examples/
-│   └── events.json
+│   ├── events.json
+│   └── expected_output.json
+├── tests/
+│   └── test_fusion_demo.py
 └── src/
     └── fusion_demo.py
 ```
@@ -144,10 +162,10 @@ cloud-ids-mlops/
 | Reproducibility + evidence | [docs/reproducibility.md](docs/reproducibility.md) |
 | Security controls | [docs/security.md](docs/security.md) |
 | Troubleshooting | [docs/troubleshooting.md](docs/troubleshooting.md) |
+| Contribution workflow | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Security policy | [SECURITY.md](SECURITY.md) |
 
 ## Reproducibility model
-
-A validation run should record enough evidence to reconstruct what happened:
 
 ```text
 Controlled action
@@ -170,11 +188,9 @@ Alert + timestamps + evidence
 
 Useful artifacts include dataset/version, feature schema, model checksum, threshold, image versions, deployment config, experiment timestamps, and raw/sanitized evidence references.
 
-See [docs/reproducibility.md](docs/reproducibility.md).
-
 ## Security model
 
-The project documents security for the security platform itself:
+The project documents:
 
 - least-privilege Kubernetes service accounts;
 - secret injection rather than committed credentials;
@@ -184,11 +200,7 @@ The project documents security for the security platform itself:
 - non-root/minimal container permissions where feasible;
 - separation of public synthetic evidence from private research evidence.
 
-See [docs/security.md](docs/security.md).
-
 ## Troubleshooting strategy
-
-The runbook follows the pipeline upstream-to-downstream:
 
 ```text
 Kubernetes health
@@ -200,9 +212,7 @@ Kubernetes health
  → alert routing
 ```
 
-That approach identifies the first failed stage instead of treating the whole IDS as one black box.
-
-See [docs/troubleshooting.md](docs/troubleshooting.md).
+The goal is to identify the **first failed stage** rather than treat the distributed IDS as a single black box.
 
 ## Technology areas
 
@@ -217,6 +227,7 @@ See [docs/troubleshooting.md](docs/troubleshooting.md).
 - streaming/data pipelines
 - feature engineering and model-serving concepts
 - ONNX deployment workflow
+- automated validation with CI/tests
 - controlled validation and evidence collection
 - security/reproducibility practices
 - incident-style troubleshooting across a distributed pipeline
