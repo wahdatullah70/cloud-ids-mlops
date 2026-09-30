@@ -1,14 +1,33 @@
 # Cloud-Native IDS + MLOps Research
 
-A research project focused on **multi-sensor intrusion detection for cloud-native and HPC-oriented infrastructure**, combining security telemetry, streaming components, and machine-learning inference.
+A portfolio/research project for **multi-sensor intrusion detection in cloud-native and HPC-oriented infrastructure**, combining network/runtime security telemetry, stream processing, machine-learning inference, Kubernetes operations, and reproducible validation.
 
-> This repository is the public engineering companion for the research work. Sensitive infrastructure data, credentials, private datasets, and environment-specific secrets are intentionally excluded.
+> This is the public engineering companion to the research work. Sensitive infrastructure data, credentials, private datasets, and restricted research evidence are intentionally excluded.
 
----
+## Architecture
 
-## ⚡ Quick Demo
+```mermaid
+flowchart LR
+    NET[Network Traffic] --> SUR[Suricata]
+    NET --> ZEEK[Zeek]
+    K8S[Kubernetes Runtime] --> TET[Tetragon]
+    SUR --> N[Normalization]
+    ZEEK --> N
+    TET --> N
+    N --> F[Feature Fusion]
+    F --> RP[Redpanda / Redis]
+    RP --> INF[ONNX Inference]
+    INF --> DEC{Score >= 0.90?}
+    DEC -->|No| B[Benign / No Alert]
+    DEC -->|Yes| A[Alert Router]
+    A --> V[Validation / Evidence]
+```
 
-The repository now includes a small reproducible multi-sensor feature-fusion example using normalized Suricata, Zeek, and Tetragon events.
+The architecture separates **collection, normalization, streaming, inference, and alerting** so each stage can be operated and troubleshot independently.
+
+## Quick demo
+
+A safe public example demonstrates the idea of multi-sensor feature fusion:
 
 ```bash
 python3 src/fusion_demo.py examples/events.json
@@ -16,159 +35,198 @@ python3 src/fusion_demo.py examples/events.json
 
 The demo:
 
-- reads normalized events from three sensor types,
-- builds a fused feature representation,
-- calculates an illustrative probability,
-- applies a configurable threshold,
+- reads example Suricata, Zeek, and Tetragon events;
+- normalizes/fuses them into a compact representation;
+- calculates an illustrative probability;
+- applies a configurable threshold;
 - outputs structured JSON.
 
-> The public demo uses illustrative weights only. It is **not** the original trained research model and does not expose confidential model artifacts.
+> The public demo uses illustrative weights. It is **not** the original trained research model and does not claim to reproduce the documented research metrics.
 
-📐 [Architecture documentation](docs/architecture.md)
-
----
-
-## 🎯 Project Goals
-
-- Combine telemetry from multiple security sensors.
-- Build a reproducible feature-processing and inference workflow.
-- Deploy security analytics in a cloud-native environment.
-- Evaluate intrusion-detection performance using public benchmark datasets.
-- Measure operational overhead and validation behavior in a research deployment.
-
----
-
-## 🏗️ System Architecture
+## End-to-end engineering flow
 
 ```text
-Network / Runtime Events
-        │
-        ├── Suricata
-        ├── Zeek
-        └── Tetragon
-             │
-             ▼
-      Telemetry Processing
-             │
-             ▼
-       Streaming / Data
-      Redpanda + Redis
-             │
-             ▼
-      Feature Processing
-             │
-             ▼
-       ONNX Inference
-             │
-             ▼
-        Alert Routing
+Sensor telemetry
+      │
+      ▼
+Normalization
+      │
+      ▼
+Feature fusion
+      │
+      ▼
+Streaming / state
+      │
+      ▼
+ONNX model inference
+      │
+      ▼
+Threshold decision
+      │
+      ▼
+Alert routing
+      │
+      ▼
+Controlled validation + evidence
 ```
 
-The broader research deployment runs in a Kubernetes-based environment and is designed to support reproducible validation of the end-to-end detection pipeline.
+Detailed flow: [docs/event-flow.md](docs/event-flow.md)
 
----
+## Experimental configuration
 
-## 🔐 Security Telemetry
+The documented research experiment used:
 
-### Suricata
-Network IDS telemetry and signature-based event visibility.
+- **CIC-IDS2017** and **UNSW-NB15**
+- **Logistic Regression**
+- **ONNX** deployment format
+- **15-dimensional fused feature representation**
+- decision threshold **0.90**
 
-### Zeek
-Network metadata and protocol-level behavioral visibility.
-
-### Tetragon
-Runtime/eBPF-oriented telemetry for container and process activity.
-
-The research pipeline fuses information derived from these sources into a compact machine-learning feature representation.
-
----
-
-## 🤖 Machine Learning / MLOps
-
-The research workflow includes:
-
-1. Dataset preparation and preprocessing.
-2. Feature transformation/fusion.
-3. Model training and evaluation.
-4. ONNX export.
-5. Container/cloud-native inference.
-6. Controlled deployment validation.
-7. Reproducibility and evidence collection.
-
-### Experimental configuration
-
-- Public datasets: **CIC-IDS2017** and **UNSW-NB15**
-- Model family used in the documented experiment: **Logistic Regression**
-- Deployment format: **ONNX**
-- Fused representation: **15 features**
-- Decision threshold: **0.90**
-
-### Reported experimental results
+### Reported experiment metrics
 
 | Metric | Result |
 |---|---:|
 | F1 | 0.93 |
 | False-positive rate | 0.04 |
 
-These figures describe the documented research experiment and should not be treated as universal production performance.
+These values describe the documented experiment and are not presented as universal production performance.
 
----
+## Kubernetes deployment model
 
-## ☸️ Platform Components
+The broader platform separates components such as:
 
-Technology areas used across the research environment include:
+```text
+Suricata / Zeek / Tetragon
+           │
+           ▼
+     Fluent Bit / collection
+           │
+           ▼
+        Redpanda
+           │
+           ▼
+     Stream Processor
+        │       │
+        ▼       ▼
+      Redis   Inference
+                 │
+                 ▼
+            Alert Router
+```
 
-`Kubernetes` · `Helm` · `Calico` · `Longhorn` · `Suricata` · `Zeek` · `Tetragon` · `Redpanda` · `Redis` · `Fluent Bit` · `Python` · `ONNX` · `Linux`
+Deployment details: [docs/deployment-topology.md](docs/deployment-topology.md)
 
----
-
-## 🧪 Validation Approach
-
-The deployment work uses controlled benign and malicious validation rather than relying only on offline model metrics.
-
-Validation activities include:
-
-- Benign observation windows
-- Negative-control checks
-- Controlled malicious-event injection
-- Pipeline filtering checks
-- Detection timing measurements
-- Operational overhead observation
-- Evidence capture for reproducibility
-
----
-
-## 📁 Public Repository Layout
+## Repository structure
 
 ```text
 cloud-ids-mlops/
 ├── README.md
 ├── docs/
-│   └── architecture.md
+│   ├── architecture.md
+│   ├── event-flow.md
+│   ├── deployment-topology.md
+│   ├── reproducibility.md
+│   ├── security.md
+│   └── troubleshooting.md
 ├── examples/
 │   └── events.json
 └── src/
     └── fusion_demo.py
 ```
 
----
+## Engineering documentation
 
-## 💡 Engineering Skills Demonstrated
+| Topic | Guide |
+|---|---|
+| System architecture | [docs/architecture.md](docs/architecture.md) |
+| Event + inference flow | [docs/event-flow.md](docs/event-flow.md) |
+| Kubernetes topology | [docs/deployment-topology.md](docs/deployment-topology.md) |
+| Reproducibility + evidence | [docs/reproducibility.md](docs/reproducibility.md) |
+| Security controls | [docs/security.md](docs/security.md) |
+| Troubleshooting | [docs/troubleshooting.md](docs/troubleshooting.md) |
 
-Cloud-native security · Kubernetes operations · Linux infrastructure · security telemetry · streaming/data pipelines · ML deployment · ONNX inference · MLOps · reproducible experimentation
+## Reproducibility model
 
----
+A validation run should record enough evidence to reconstruct what happened:
 
-## 🔒 Security & Reproducibility Note
+```text
+Controlled action
+      │
+      ▼
+Sensor observation
+      │
+      ▼
+Normalized / fused record
+      │
+      ▼
+Inference score
+      │
+      ▼
+Threshold decision
+      │
+      ▼
+Alert + timestamps + evidence
+```
 
-Do **not** commit API keys, kubeconfig credentials, cloud credentials, service-account keys, private datasets, or confidential research evidence. Use environment variables, Kubernetes Secrets, or a secret manager.
+Useful artifacts include dataset/version, feature schema, model checksum, threshold, image versions, deployment config, experiment timestamps, and raw/sanitized evidence references.
 
----
+See [docs/reproducibility.md](docs/reproducibility.md).
 
-## 👤 Author
+## Security model
 
-**Wahdat Ullah**  
-Research Assistant — HPC & Cloud Computing  
-Interests: HPC, Linux Systems, Kubernetes, Cloud Security, DevOps, MLOps
+The project documents security for the security platform itself:
 
-Portfolio: [My_Protfolio](https://github.com/wahdatullah70/My_Protfolio)
+- least-privilege Kubernetes service accounts;
+- secret injection rather than committed credentials;
+- NetworkPolicies where appropriate;
+- controlled access to raw telemetry;
+- pinned/versioned model and feature artifacts;
+- non-root/minimal container permissions where feasible;
+- separation of public synthetic evidence from private research evidence.
+
+See [docs/security.md](docs/security.md).
+
+## Troubleshooting strategy
+
+The runbook follows the pipeline upstream-to-downstream:
+
+```text
+Kubernetes health
+ → sensor output
+ → collection/forwarding
+ → Redpanda/streaming
+ → feature processing
+ → inference
+ → alert routing
+```
+
+That approach identifies the first failed stage instead of treating the whole IDS as one black box.
+
+See [docs/troubleshooting.md](docs/troubleshooting.md).
+
+## Technology areas
+
+`Kubernetes` · `Helm` · `Calico` · `Longhorn` · `Suricata` · `Zeek` · `Tetragon` · `Redpanda` · `Redis` · `Fluent Bit` · `Python` · `ONNX` · `Linux`
+
+## What this project demonstrates
+
+- cloud-native security architecture
+- Kubernetes platform operations
+- Linux infrastructure
+- multi-sensor telemetry handling
+- streaming/data pipelines
+- feature engineering and model-serving concepts
+- ONNX deployment workflow
+- controlled validation and evidence collection
+- security/reproducibility practices
+- incident-style troubleshooting across a distributed pipeline
+
+## Public repository policy
+
+Do not commit API keys, cloud credentials, kubeconfig files, service-account private keys, confidential datasets, sensitive packet captures, or restricted research evidence. Use sanitized examples and runtime secret management for public work.
+
+## Author
+
+**Wahdat Ullah** — Research Assistant, HPC & Cloud Computing
+
+[GitHub Profile](https://github.com/wahdatullah70) · [Engineering Portfolio](https://github.com/wahdatullah70/My_Protfolio)
