@@ -1,0 +1,10 @@
+[
+  {"sensor":"suricata","severity":2,"signature":"ET POLICY Example"},
+  {"sensor":"suricata","severity":4,"signature":"Demo high severity alert"},
+  {"sensor":"zeek","destination":"10.10.0.15","state":"established"},
+  {"sensor":"zeek","destination":"10.10.0.21","state":"failed"},
+  {"sensor":"zeek","destination":"10.10.0.22","state":"failed"},
+  {"sensor":"tetragon","type":"process","privileged":false},
+  {"sensor":"tetragon","type":"process","privileged":true},
+  {"sensor":"tetragon","type":"network","privileged":false}
+]
