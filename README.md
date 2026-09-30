@@ -85,6 +85,20 @@ Controlled validation + evidence
 
 Detailed flow: [docs/event-flow.md](docs/event-flow.md)
 
+## Documented research evidence
+
+A separate summary preserves previously documented research values without pretending that the public demo reproduced them:
+
+- **F1:** 0.93
+- **False-positive rate:** 0.04
+- **Benign observation window:** 7.11 hours
+- **Negative control:** passed
+- **First malicious detection:** 1.645 seconds after controlled attack start
+- **Additional CPU overhead:** <3%
+- **Approximate RAM overhead:** ~512 MB per node
+
+See [docs/research-evidence-summary.md](docs/research-evidence-summary.md) for the complete table, limitations, and evidence-chain explanation.
+
 ## Experimental configuration
 
 The documented research experiment used:
@@ -141,6 +155,7 @@ cloud-ids-mlops/
 │   ├── event-flow.md
 │   ├── deployment-topology.md
 │   ├── reproducibility.md
+│   ├── research-evidence-summary.md
 │   ├── security.md
 │   └── troubleshooting.md
 ├── examples/
@@ -160,6 +175,7 @@ cloud-ids-mlops/
 | Event + inference flow | [docs/event-flow.md](docs/event-flow.md) |
 | Kubernetes topology | [docs/deployment-topology.md](docs/deployment-topology.md) |
 | Reproducibility + evidence | [docs/reproducibility.md](docs/reproducibility.md) |
+| Historical research evidence | [docs/research-evidence-summary.md](docs/research-evidence-summary.md) |
 | Security controls | [docs/security.md](docs/security.md) |
 | Troubleshooting | [docs/troubleshooting.md](docs/troubleshooting.md) |
 | Contribution workflow | [CONTRIBUTING.md](CONTRIBUTING.md) |
@@ -229,6 +245,7 @@ The goal is to identify the **first failed stage** rather than treat the distrib
 - ONNX deployment workflow
 - automated validation with CI/tests
 - controlled validation and evidence collection
+- transparent separation of demo artifacts from historical research results
 - security/reproducibility practices
 - incident-style troubleshooting across a distributed pipeline
 
