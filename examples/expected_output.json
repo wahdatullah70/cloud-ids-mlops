@@ -1,0 +1,16 @@
+{
+  "features": {
+    "suricata_alerts": 2,
+    "suricata_high_severity": 1,
+    "zeek_connections": 3,
+    "zeek_failed_connections": 2,
+    "zeek_unique_destinations": 3,
+    "tetragon_process_events": 2,
+    "tetragon_privileged_events": 1,
+    "tetragon_network_events": 1
+  },
+  "demo_probability": 0.746494,
+  "threshold": 0.9,
+  "classification": "benign",
+  "note": "Demo-only scoring; not the original research model."
+}
